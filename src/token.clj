@@ -15,19 +15,16 @@
       {}
       )))
 
-(defn get-all-matches [rules text]
-  (reverse
+(defn get-best-match [rules text]
+  (last
     (sort-by (fn [match] (:length match))
-     (filter (fn [match] (= 0 (:start match)))
-          (for [rule rules] (get-next-match rule text))))))
-
-(defn get-first-match [rules text]
-  (first (get-all-matches rules text)))
+             (filter (fn [match] (= 0 (:start match)))
+                     (for [rule rules] (get-next-match rule text))))))
 
 (defn process-helper [rules text tokens]
   (if (empty? text)
     tokens
-     (let [match (get-first-match rules text)]
+     (let [match (get-best-match rules text)]
      (if (seq match)
        (let [remaining-text (subs text (:end match))
              all-tokens (conj tokens (:token match))]
@@ -37,3 +34,5 @@
   
 (defn process [rules text]
   (process-helper rules text []))
+
+;todo: take first rule if two things match with same length
