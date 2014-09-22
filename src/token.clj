@@ -1,11 +1,5 @@
 (ns token)
 
-(def rules [[#"[a-z]+" :LOWER-ID]
-            [#"[a-zA-Z]+" :UPPER-ID]
-            [#"\s+" :SPACE]
-            [#"[0-9]+" :NUM]
-            [#"&" :IGNORE]])
-
 (defn get-next-match [[regex token] text]
   (let [matcher (re-matcher regex text)]
     (if (.find matcher)
@@ -28,16 +22,16 @@
     tokens
     (conj tokens this-token)))
 
-(defn process-helper [rules text tokens]
-  (if (empty? text)
-    tokens
-     (let [match (get-best-match rules text)]
-     (if (seq match)
-       (let [remaining-text (subs text (:end match))
-             all-tokens (append-token-if-not-ignored tokens (:token match))]
-         (process-helper rules remaining-text all-tokens))
-       []
-       ))))
-  
-(defn process [rules text]
-  (process-helper rules text []))
+(defn get-tokens [rules text]
+  (loop [rules rules
+         text text
+         tokens []]
+    (if (empty? text)
+      tokens
+      (let [match (get-best-match rules text)]
+        (if (seq match)
+          (let [remaining-text (subs text (:end match))
+                all-tokens (append-token-if-not-ignored tokens (:token match))]
+            (recur rules remaining-text all-tokens))
+          []
+          )))))
