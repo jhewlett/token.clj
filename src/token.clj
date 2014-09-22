@@ -17,11 +17,10 @@
 
 (defn get-best-match [rules text]
   (let [all-matches (for [rule rules] (get-next-match rule text))
-        matches-at-start (filter (fn [match] (= 0 (:start match))) all-matches)
+        reversed-matches (reverse all-matches)
+        matches-at-start (filter (fn [match] (= 0 (:start match))) reversed-matches)
         ordered-by-match-length (sort-by (fn [match] (:length match)) matches-at-start)]
     (last ordered-by-match-length)))
-
-;(- (count matches-at-start) (.indexOf matches-at-start match)
 
 (defn process-helper [rules text tokens]
   (if (empty? text)
