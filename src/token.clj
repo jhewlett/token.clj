@@ -10,12 +10,16 @@
       {}
       )))
 
+(defn matches-at-start-of-word? [match]
+  (= 0 (:start match)))
+
 (defn get-best-match [rules text]
-  (let [all-matches (for [rule rules] (get-next-match rule text))
-        reversed-matches (reverse all-matches)
-        matches-at-start (filter (fn [match] (= 0 (:start match))) reversed-matches)
-        ordered-by-match-length (sort-by (fn [match] (:length match)) matches-at-start)]
-    (last ordered-by-match-length)))
+  (->>
+    (for [rule rules] (get-next-match rule text))
+    reverse
+    (filter matches-at-start-of-word?)
+    (sort-by (fn [match] (:length match)))
+    last))
 
 (defn append-token-if-not-ignored [tokens this-token]
   (if (= this-token :IGNORE)
